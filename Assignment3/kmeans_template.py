@@ -14,6 +14,13 @@ def update_assignments(data, centroids):
 
     Tie rule: a point equidistant from several centroids goes to the one with
     the LOWEST index (np.argmin returns the first minimum).
+
+    Input: 
+    - data: data is an array
+    - centroids: centroids is an array
+
+    Output: 
+    - Returns updated array 
     """
     import numpy as np
     # squared Euclidean distances, shape (n, k)
@@ -23,27 +30,25 @@ def update_assignments(data, centroids):
 
 def update_centroids(data, centroids, assignments):
     """Return an updated (k, d) centroid array based on cluster assignments.
-
-    Empty-cluster policy: an empty cluster's centroid is re-seeded to the data
-    point currently farthest from its own assigned centroid (distinct points for
-    distinct empty clusters). This also rescues duplicate initial centroids,
-    where the higher-index duplicate always loses ties and would stay empty.
-    The input centroid array is not modified.
     """
     import numpy as np
     new = np.array(centroids, dtype=float, copy=True)
-    empty = []
+    empty_clusters = 0
     for j in range(len(centroids)):
         mask = assignments == j
         if mask.any():
             new[j] = data[mask].mean(axis=0)
         else:
-            empty.append(j)
-    if empty:
+            empty_clusters += 1 # adding one
+    if empty_clusters: # if its not a zero val
         d2_own = ((data - centroids[assignments]) ** 2).sum(axis=1)
         farthest_first = np.argsort(-d2_own, kind="stable")
+        replacement_idx = 0 
+        
         for j, idx in zip(empty, farthest_first):
-            new[j] = data[idx]
+            if not (assignments == j).any():
+                new[j] = data[farthest_first[replacement_idx]]
+                replacement_idx += 1
     return new
 
 

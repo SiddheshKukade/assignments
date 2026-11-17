@@ -5,6 +5,8 @@ Complete the TODOs. Keep test labels clean and use them only for evaluation.
 
 import argparse
 from pathlib import Path
+import pandas as pd
+import numpy as np 
 
 SVM_C = 1.0
 SVM_GAMMA = 0.01
@@ -19,7 +21,7 @@ def generate_clean_split(rng, samples_per_class=1000):
     Negative class: mean (-1, -1), covariance 3I.
     The negative covariance entries are variances, not standard deviations.
     """
-    import numpy as np
+
     positive = rng.multivariate_normal((1, 1), np.eye(2), samples_per_class)
     negative = rng.multivariate_normal((-1, -1), 3 * np.eye(2), samples_per_class)
     features = np.vstack((positive, negative))
@@ -35,7 +37,6 @@ def corrupt_training_labels(clean_labels, rng):
     uniform draw is made per example, so nothing can be flipped twice.
     Returns a new array; clean_labels is unchanged.
     """
-    import numpy as np
     clean_labels = np.asarray(clean_labels)
     p_flip = np.where(clean_labels == 1,
                       POSITIVE_FLIP_PROBABILITY, NEGATIVE_FLIP_PROBABILITY)
@@ -51,7 +52,6 @@ def repair_labels_knn(train_features, noisy_labels, neighbors):
     Equal-distance ties are resolved by the library consistently (the smaller
     row index comes first after a stable ordering of the returned neighbors).
     """
-    import numpy as np
     from sklearn.neighbors import NearestNeighbors
     noisy_labels = np.asarray(noisy_labels)
     nn = NearestNeighbors(n_neighbors=neighbors + 1, algorithm="brute",
@@ -80,8 +80,6 @@ def train_and_evaluate(train_features, train_labels, test_features, test_labels)
 
 def run_comparison(repeats, seed, neighbors, output_path):
     """Q3(a-b): compare the noisy baseline with K-NN label repair."""
-    import numpy as np
-    import pandas as pd
 
     rng = np.random.default_rng(seed)
     train_x, train_y = generate_clean_split(rng)    # fixed across trials

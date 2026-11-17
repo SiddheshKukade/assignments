@@ -89,12 +89,12 @@ def run_comparison(repeats, seed, neighbors, output_path):
     test_x, test_y = generate_clean_split(rng)      # independent, clean
 
     rows = []
-    for trial in range(1, repeats + 1):
+    for trial in range(repeats):
         noisy_y = corrupt_training_labels(train_y, rng)
         baseline = train_and_evaluate(train_x, noisy_y, test_x, test_y)
         repaired_y = repair_labels_knn(train_x, noisy_y, neighbors)
         knn = train_and_evaluate(train_x, repaired_y, test_x, test_y)
-        rows.append({"trial": trial, "baseline_accuracy": baseline,
+        rows.append({"trial": trial + 1, "baseline_accuracy": baseline,
                      "knn_accuracy": knn})
 
     df = pd.DataFrame(rows)

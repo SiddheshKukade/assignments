@@ -7,6 +7,9 @@ import argparse
 from pathlib import Path
 import pandas as pd
 import numpy as np 
+from sklearn.neighbors import NearestNeighbors
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
 
 SVM_C = 1.0
 SVM_GAMMA = 0.01
@@ -52,7 +55,9 @@ def repair_labels_knn(train_features, noisy_labels, neighbors):
     Equal-distance ties are resolved by the library consistently (the smaller
     row index comes first after a stable ordering of the returned neighbors).
     """
-    from sklearn.neighbors import NearestNeighbors
+    if neighbors % 2 == 0:
+    raise ValueError("neighbors must be odd nummber")
+
     noisy_labels = np.asarray(noisy_labels)
     nn = NearestNeighbors(n_neighbors=neighbors + 1, algorithm="brute",
                           metric="euclidean").fit(train_features)
@@ -71,8 +76,6 @@ def repair_labels_knn(train_features, noisy_labels, neighbors):
 
 def train_and_evaluate(train_features, train_labels, test_features, test_labels):
     """Train the required RBF SVM and return accuracy on the clean test set."""
-    from sklearn.svm import SVC
-    from sklearn.metrics import accuracy_score
     model = SVC(kernel="rbf", C=SVM_C, gamma=SVM_GAMMA)
     model.fit(train_features, train_labels)
     return float(accuracy_score(test_labels, model.predict(test_features)))

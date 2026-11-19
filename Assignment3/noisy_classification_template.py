@@ -56,7 +56,7 @@ def repair_labels_knn(train_features, noisy_labels, neighbors):
     row index comes first after a stable ordering of the returned neighbors).
     """
     if neighbors % 2 == 0:
-    raise ValueError("neighbors must be odd nummber")
+        raise ValueError("neighbors must be odd nummber")
 
     noisy_labels = np.asarray(noisy_labels)
     nn = NearestNeighbors(n_neighbors=neighbors + 1, algorithm="brute",
